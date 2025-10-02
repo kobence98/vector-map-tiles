@@ -149,6 +149,10 @@ required by the theme.
 The theme uses the following sources: ${theme.tileSources.toList().sorted().join(', ')}.
 '''
             .trim());
+    assert(
+        maximumTileSubstitutionDifference >= 0 &&
+            maximumTileSubstitutionDifference <= 3,
+        'maximumTileSubstitutionDifference must be >= 0 and <= 3');
     assert(memoryTileDataCacheMaxSize >= 0 && memoryTileDataCacheMaxSize < 100);
   }
 
