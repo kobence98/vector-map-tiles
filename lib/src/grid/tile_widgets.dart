@@ -5,6 +5,7 @@ import 'package:vector_tile_renderer/vector_tile_renderer.dart';
 
 import '../../vector_map_tiles.dart';
 import '../cache/text_cache.dart';
+import '../provider/max_zoom_vector_tile_provider.dart';
 import '../stream/tile_supplier.dart';
 import '../stream/tile_supplier_raster.dart';
 import '../tile_viewport.dart';
@@ -194,10 +195,14 @@ class TileWidgets extends ChangeNotifier {
   }
 
   Set<TileIdentity> _reduce(List<TileIdentity> tiles) {
-    final translator = SlippyMapTranslator(_tileProvider.maximumZoom);
+    // Use actual maximum zoom for translation to handle overzooming correctly
+    final translationZoom = _tileProvider is MaxZoomVectorTileProvider
+        ? (_tileProvider as MaxZoomVectorTileProvider).actualMaximumZoom
+        : _tileProvider.maximumZoom;
+    final translator = SlippyMapTranslator(translationZoom);
     final reduced = <TileIdentity>{};
     for (final tile in tiles) {
-      final zoomStep = tile.z > _tileProvider.maximumZoom ? tile.z : tile.z;
+      final zoomStep = tile.z > translationZoom ? tile.z : tile.z;
       final translation =
           translator.specificZoomTranslation(tile, zoom: zoomStep);
       reduced.add(translation.translated);

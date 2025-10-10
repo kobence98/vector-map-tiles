@@ -14,7 +14,8 @@ import '../../vector_map_tiles.dart';
 /// Example:
 /// ```dart
 /// final provider = MaxZoomVectorTileProvider(
-///   maxZoom: 14,
+///   maxZoom: 14, // Server only provides tiles up to zoom 14
+///   maximumZoom: 20, // But allow map to zoom to 20
 ///   delegate: CachingVectorTileProvider(
 ///     cache: storageCache,
 ///     cacheKey: (tile) => 'tiles-${tile.z}-${tile.x}-${tile.y}.pbf',
@@ -36,16 +37,25 @@ class MaxZoomVectorTileProvider extends VectorTileProvider {
   /// NetworkVectorTileProvider.
   final VectorTileProvider delegate;
 
+  /// The maximum zoom level that the map can display.
+  /// If not specified, defaults to 22 to allow overzooming.
+  final int? _overrideMaximumZoom;
+
   MaxZoomVectorTileProvider({
     required this.maxZoom,
     required this.delegate,
-  });
+    int? maximumZoom,
+  }) : _overrideMaximumZoom = maximumZoom;
 
   @override
-  int get maximumZoom => delegate.maximumZoom;
+  int get maximumZoom => _overrideMaximumZoom ?? 22;
 
   @override
   int get minimumZoom => delegate.minimumZoom;
+
+  /// The actual maximum zoom level that has tile data.
+  /// This is used by the translation system to calculate correct tile positioning.
+  int get actualMaximumZoom => maxZoom;
 
   @override
   TileOffset get tileOffset => delegate.tileOffset;

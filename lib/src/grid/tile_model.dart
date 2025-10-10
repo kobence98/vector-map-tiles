@@ -8,6 +8,7 @@ import 'package:vector_tile_renderer/vector_tile_renderer.dart';
 import '../../vector_map_tiles.dart';
 import '../io/io.dart';
 import '../profiler.dart';
+import '../provider/max_zoom_vector_tile_provider.dart';
 import '../stream/tile_supplier.dart';
 import '../stream/tile_supplier_raster.dart';
 import 'slippy_map_translator.dart';
@@ -58,8 +59,11 @@ class VectorTileModel extends ChangeNotifier {
       this.paintBackground,
       this.showTileDebugInfo) {
     layers = TileLayerComposer().compose(this, theme, sprites);
-    defaultTranslation =
-        SlippyMapTranslator(tileProvider.maximumZoom).translate(tile);
+    // Use actual maximum zoom for translation to handle overzooming correctly
+    final translationZoom = tileProvider is MaxZoomVectorTileProvider
+        ? (tileProvider as MaxZoomVectorTileProvider).actualMaximumZoom
+        : tileProvider.maximumZoom;
+    defaultTranslation = SlippyMapTranslator(translationZoom).translate(tile);
     _firstRenderedTask = tileRenderingTask(tile);
   }
 
@@ -78,7 +82,11 @@ class VectorTileModel extends ChangeNotifier {
 
   void _receiveTile(TileResponse received, RasterTileset rasterTileset,
       ui.Image? spriteImage) {
-    final newTranslation = SlippyMapTranslator(tileProvider.maximumZoom)
+    // Use actual maximum zoom for translation to handle overzooming correctly
+    final translationZoom = tileProvider is MaxZoomVectorTileProvider
+        ? (tileProvider as MaxZoomVectorTileProvider).actualMaximumZoom
+        : tileProvider.maximumZoom;
+    final newTranslation = SlippyMapTranslator(translationZoom)
         .specificZoomTranslation(tile, zoom: received.identity.z);
     tileset = received.tileset;
     translation = newTranslation;
