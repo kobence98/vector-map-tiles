@@ -55,8 +55,10 @@ class GridTileSizer {
     var translationDelta = Offset.zero;
     var effectiveScale = scale;
     if (translation.isTranslated) {
-      final dx = -(translation.xOffset * size.width);
-      final dy = -(translation.yOffset * size.height);
+      // Calculate offset based on parent tile size, not current tile size
+      final parentTileSize = size.width / translation.fraction;
+      final dx = -(translation.xOffset * parentTileSize);
+      final dy = -(translation.yOffset * parentTileSize);
       translationDelta = Offset(dx, dy);
       effectiveScale = effectiveScale * translation.fraction.toDouble();
     }

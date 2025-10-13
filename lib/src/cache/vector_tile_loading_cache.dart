@@ -8,6 +8,7 @@ import 'package:vector_tile_renderer/vector_tile_renderer.dart';
 import '../extensions.dart';
 import '../grid/constants.dart';
 import '../grid/slippy_map_translator.dart';
+import '../provider/max_zoom_vector_tile_provider.dart';
 import '../provider_exception.dart';
 import '../tile_identity.dart';
 import '../tile_providers.dart';
